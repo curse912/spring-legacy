@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -83,6 +84,12 @@ height:80%; position:absolute; margin:auto; top:0px; bottom:0px; right:0px; left
 </style>
 </head>
 <body>
+<c:if test="${not empty alertMsg }">
+	<script type="text/javascript">
+		alertify.alert("서비스 요청 성공",'${alertMsg}')
+	</script>
+</c:if>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" scope="application" />
 	<div id="header">
 		<div id="header_1">
 			<div id="header_1_left">
@@ -90,9 +97,28 @@ height:80%; position:absolute; margin:auto; top:0px; bottom:0px; right:0px; left
 			</div>
 			<div id="header_1_center">
 			</div>
+			<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+			<c:set var="principal" value="${pageContext.request.userPrincipal}"/>
 			<div id="header_1_right">
-				<a href="${contextPath }/member/insert">회원가입</a>
-				<a href="${contextPath }/member/login">로그인</a>
+				<c:choose>
+					<c:when test="${empty principal}">
+						<a href="${contextPath }/security/insert">회원가입</a>
+						<a href="${contextPath }/member/login">로그인</a>
+					</c:when>
+					<c:otherwise>
+						<span>${loginUser.userName }님	<!-- principal -->
+							환영합니다 ^^</span>
+						<a href="${contextPath}/security/myPage"
+							class="text-decoration-none text-secondary">마이페이지</a>
+						<form:form action="${contextPath}/member/logout" method="post" style="display:inline;">
+						    <button type="submit"
+						            class="border-0 bg-transparent text-secondary p-0 ml-2"
+						            style="cursor:pointer;">
+						        로그아웃
+						    </button>
+						</form:form>				
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</div>
 		<div id="header_2">
@@ -100,7 +126,7 @@ height:80%; position:absolute; margin:auto; top:0px; bottom:0px; right:0px; left
 				<li><a href="${contextPath }">HOME</a></li>
 				<li><a href="${contextPath }/chat/chatRoomList">채팅</a></li>
 				<li><a href="${contextPath }/board/list/N">일반게시판</a></li>
-				<li><a href="${contextPath }/board/list/P">사진게시판</a></li>
+				<li><a href="${contextPath }/board/list/P">사진게시판</a></li> 
 			</ul>
 		</div>	
 	</div>

@@ -1,34 +1,51 @@
 package com.kh.spring.member.model.service;
 
+import java.util.HashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.kh.spring.member.model.dao.MemberDao;
+import com.kh.spring.member.model.dao.MemberDaoImpl;
 import com.kh.spring.member.model.vo.Member;
 
+@Service	//Component scan에 의해 bean객체로 등록도리 클래스를 지정
 public class MemberServiceImpl implements MemberService {
 
+	@Autowired
 	private MemberDao memberDao;
+	
+	@Override
+	public Member loginMember(Member m) {
+		
+		return memberDao.loginMember(m);
+	}	
 
 	@Override
 	public Member loginMember(String userId) {
-
+		
 		return null;
 	}
 
 	@Override
 	public int insertMember(Member m) {
+		int result=memberDao.insertMember(m);
+		//회원 ID와 기본 USER권한 추가
+		memberDao.insertAuthority(m);
 
-		return 0;
+		return result;
 	}
 
 	@Override
 	public int updateMember(Member m) {
 
-		return 0;
+		return memberDao.updateMember(m);
 	}
 
 	@Override
 	public int idCheck(String userId) {
 
-		return 0;
+		return memberDao.idCheck(userId);
 	}
 
 	@Override
@@ -36,4 +53,10 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 
+	@Override
+	public HashMap<String, Object> selectOne(String userId) {
+		return memberDao.selectOne(userId);
+	}
+
+	
 }
