@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.spring.member.model.service.MemberService;
@@ -30,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
+//@RequestMapping("/sequrity")
 public class SecurityController {
 	
 	//의존성 주입방법 : field or 생성자
@@ -43,7 +46,7 @@ public class SecurityController {
 	}
 	
 	// 에러페이지 포워딩용 url
-	@GetMapping("/security/accessDenied")
+	@RequestMapping("/security/accessDenied")
 	public String accessDenied(Model model) {
 		model.addAttribute("errorMsg","접근불가!!!!!!!!!");
 		return "common/errorPage";
@@ -124,5 +127,29 @@ public class SecurityController {
 		log.info("principal2 = {}", principal2);
 		
 		return"member/myPage";
+	}
+	
+	@PostMapping("/security/update")
+	public String update( @Validated @ModelAttribute MemberExt loginUser,
+						  BindingResult bindResult,
+						  Authentication auth,	//로그인한 사용자 인증정보
+						  RedirectAttributes ra)	{
+		if(bindResult.hasErrors()) {
+			return "redirect:/security/myPage";
+		}
+		// 비즈니스 로직
+		//1. db의 member객체를 수정
+		mService.updateMember(loginUser);
+		
+		//2. 변경된 회원정보를 DB에서 얻어온 후 새로운 인증정보 생성하여 스레드로컬에 저장
+		//	  - 변경된 회원정보 (loginUser)
+		//	  - authorites,credentials 필요
+		
+		// 새로운 Authentication 객체 생성
+		Authentication newAuth = new UsernamePasswordAuthenticationToken(loginUser, auth.getCredentials(),auth.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(newAuth);
+		ra.addFlashAttribute("alertMsg","내 정보 수정 성공");
+		return "redirect:/security/myPage";
+		
 	}
 }
