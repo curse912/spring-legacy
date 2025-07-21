@@ -87,7 +87,7 @@ public class BoardDaoImpl implements BoardDao{
 
 	@Override
 	public List<BoardType> selectBoardTypeList() {
-		return null;
+		return session.selectList("board.selectBoardTypeList");
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class BoardDaoImpl implements BoardDao{
 
 	@Override
 	public List<String> selectFileList() {
-		return null;
+		return session.selectList("board.selectFileList");
 	}
 
 

@@ -154,11 +154,28 @@ div {
 </style>
 </head>
 <body>
-	<c:if test="${not empty alertMsg }">
-		<script type="text/javascript">
-			alertify.alert("서비스 요청 성공", '${alertMsg}')
-		</script>
-	</c:if>
+<script
+		src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>	
+<script>
+	$(function(){
+		const webSocket = new SockJS("${contextPath}/stomp");
+		const stompClient = Stomp.over(webSocket);
+		
+		stompClient.connect({} , function(){
+			// 전체 공지사항 url 구독
+			stompClient.subscribe("/topic/notice", function(message){
+				alertify.alert(message.body);
+			})
+		});
+	})
+</script>
+
+<c:if test="${not empty alertMsg}">
+<script>
+	alertify.alert("서비스요청결과",'${alertMsg}')
+</script>
+</c:if>
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"
 		scope="application" />
 	<div id="header">
